@@ -1,13 +1,112 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>StylishName.click — Stylish Name Generator</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stylish Name Generator — 617 Unicode Styles (Open Source)</title>
+<meta name="description" content="Free open-source stylish name generator: type a name, get 617 decorated Unicode styles with live fit checks for Free Fire (12), PUBG Mobile (16), Instagram (30) and TikTok (30).">
+<style>
+  :root { --bg:#0f0a1f; --card:#1b1430; --line:#322a52; --text:#f2eefc; --muted:#b7aed6; --accent:#8b5cf6; --ok:#34d399; --no:#f87171; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; background:var(--bg); color:var(--text); }
+  header, main, footer { max-width:880px; margin:0 auto; padding:20px 16px; }
+  header { text-align:center; padding-top:36px; }
+  h1 { font-size:1.9rem; margin:0 0 8px; }
+  h1 .grad { background:linear-gradient(90deg,#a78bfa,#f472b6); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  p.sub { color:var(--muted); margin:0 auto; max-width:620px; line-height:1.55; }
+  .bar { display:flex; gap:10px; flex-wrap:wrap; margin:22px 0 6px; }
+  input[type="text"] { flex:1 1 240px; padding:13px 15px; font-size:1.05rem; border-radius:12px; border:1px solid var(--line); background:var(--card); color:var(--text); }
+  select { padding:13px; border-radius:12px; border:1px solid var(--line); background:var(--card); color:var(--text); }
+  .count { color:var(--muted); font-size:.92rem; margin:8px 2px 14px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:10px; }
+  .style { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:12px 14px; cursor:pointer; text-align:left; color:var(--text); width:100%; }
+  .style:hover { border-color:var(--accent); }
+  .style .name { font-size:1.12rem; word-break:break-all; display:block; margin-bottom:6px; }
+  .style .label { font-size:.78rem; color:var(--muted); display:block; }
+  .badge { font-size:.72rem; border-radius:999px; padding:2px 8px; margin-right:4px; display:inline-block; margin-top:6px; }
+  .badge.ok { background:rgba(52,211,153,.15); color:var(--ok); }
+  .badge.no { background:rgba(248,113,113,.13); color:var(--no); }
+  .copied { outline:2px solid var(--ok); }
+  footer { color:var(--muted); font-size:.9rem; text-align:center; line-height:1.7; padding-bottom:40px; }
+  a { color:#c4b5fd; }
+</style>
 </head>
 <body>
-<h1>StylishName.click — Stylish Name Generator</h1>
-<p>StylishName.click is a free online stylish name generator. Type any name and get 222+ decorated Unicode styles — blackletter, script, framed and gaming styles — each with a live fit badge showing whether it fits Free Fire (12 characters), PUBG Mobile (16), Instagram (30) or TikTok (30). Includes ready-made name lists by mood, girl-name collections by origin with meanings, platform name guides, and one-tap copy. No sign-up, works entirely in the browser.</p>
-<p><a href="https://www.stylishname.click/">Try it free: StylishName.click</a></p>
+<header>
+  <h1>Stylish Name Generator <span class="grad">— 617 styles</span></h1>
+  <p class="sub">The open-source engine behind <a href="https://www.stylishname.click/">StylishName.click</a>.
+  Type a name, tap any style to copy it. Badges show whether the styled name fits each platform's character limit.</p>
+  <div class="bar">
+    <input type="text" id="name" value="Ali" maxlength="40" aria-label="Your name" placeholder="Type your name…">
+    <select id="platform" aria-label="Only show styles that fit this platform">
+      <option value="">All platforms</option>
+      <option value="freefire">Fits Free Fire (12)</option>
+      <option value="pubg">Fits PUBG Mobile (16)</option>
+      <option value="instagram">Fits Instagram (30)</option>
+      <option value="tiktok">Fits TikTok (30)</option>
+    </select>
+  </div>
+  <p class="count" id="count" role="status"></p>
+</header>
+<main>
+  <div class="grid" id="grid"></div>
+</main>
+<footer>
+  MIT licensed — source, tests and contributing guide on
+  <a href="https://github.com/Gillani77556/stylishname-click">GitHub</a>.
+  Maintained by Usman Syed. Full tool with name guides and ready-made lists:
+  <a href="https://www.stylishname.click/">stylishname.click</a>
+</footer>
+<script src="src/stylish-name.js"></script>
+<script>
+(function () {
+  var input = document.getElementById('name');
+  var platform = document.getElementById('platform');
+  var grid = document.getElementById('grid');
+  var count = document.getElementById('count');
+  var PLATFORM_LABELS = { freefire: 'Free Fire', pubg: 'PUBG', instagram: 'Instagram', tiktok: 'TikTok' };
+
+  function render() {
+    var name = input.value || 'Ali';
+    var filter = platform.value;
+    var results = window.StylishName.generate(name);
+    if (filter) results = results.filter(function (s) { return s.fits[filter]; });
+    count.textContent = results.length + ' styles for "' + name + '"' + (filter ? ' that fit ' + PLATFORM_LABELS[filter] : '') + ' — tap to copy';
+    grid.textContent = '';
+    results.forEach(function (s) {
+      var btn = document.createElement('button');
+      btn.className = 'style';
+      btn.type = 'button';
+      var nameSpan = document.createElement('span');
+      nameSpan.className = 'name';
+      nameSpan.textContent = s.text;
+      var label = document.createElement('span');
+      label.className = 'label';
+      label.textContent = s.label;
+      btn.appendChild(nameSpan);
+      btn.appendChild(label);
+      Object.keys(PLATFORM_LABELS).forEach(function (k) {
+        var b = document.createElement('span');
+        b.className = 'badge ' + (s.fits[k] ? 'ok' : 'no');
+        b.textContent = PLATFORM_LABELS[k] + (s.fits[k] ? ' ✓' : ' ✗');
+        btn.appendChild(b);
+      });
+      btn.addEventListener('click', function () {
+        var done = function () {
+          btn.classList.add('copied');
+          setTimeout(function () { btn.classList.remove('copied'); }, 900);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(s.text).then(done, done);
+        } else { done(); }
+      });
+      grid.appendChild(btn);
+    });
+  }
+  input.addEventListener('input', render);
+  platform.addEventListener('change', render);
+  render();
+})();
+</script>
 </body>
 </html>
